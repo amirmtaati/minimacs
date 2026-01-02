@@ -1,35 +1,127 @@
+;;; -------------------------
+;;; Package system
+;;; -------------------------
 (require 'package)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/") ("org" . "https://orgmode.org/elpa/") ("gnu" . "https://elpa.gnu.org/packages/") ("elpa" . "https://elpa.gnu.org/packages/") ("nongnu" . "https://elpa.nongnu.org/nongnu/")))
+(setq package-archives
+      '(("gnu" . "https://elpa.gnu.org/packages/")
+        ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+        ("melpa" . "https://melpa.org/packages/")))
 (package-initialize)
-(unless package-archive-contents (package-refresh-contents))
-(unless (package-installed-p 'use-package) (package-install 'use-package))
+
+(unless package-archive-contents
+  (package-refresh-contents))
+
+(unless (package-installed-p 'use-package)
+  (package-install 'use-package))
+
 (require 'use-package)
-(setq use-package-always-ensure t use-package-verbose t)
-(tool-bar-mode -1) (menu-bar-mode -1) (scroll-bar-mode -1)
-(setq inhibit-startup-message t) (global-display-line-numbers-mode t) (show-paren-mode t)
-(setq make-backup-files nil auto-save-default nil create-lockfiles nil)
-(set-face-attribute 'default nil :family "Fira Code" :height 140)
-(load-theme 'monokai t)
-(use-package ivy :diminish :bind (("C-s" . swiper)) :config (ivy-mode 1) (setq ivy-use-virtual-buffers t))
-(use-package counsel :bind (("M-x" . counsel-M-x) ("C-x C-f" . counsel-find-file) ("C-x b" . counsel-switch-buffer)))
-(use-package which-key :diminish which-key-mode :config (which-key-mode))
-(use-package company :hook (prog-mode . company-mode) :config (setq company-idle-delay 0.2 company-minimum-prefix-length 2))
-(use-package magit :bind ("C-x g" . magit-status))
-(use-package projectile :diminish projectile-mode :config (projectile-mode +1) :bind (:map projectile-mode-map ("C-c p" . projectile-command-map)))
-(use-package flycheck :hook (prog-mode . flycheck-mode))
-(use-package python-mode :mode "\\.py\\'")
-(use-package go-mode :mode "\\.go\\'")
-(use-package evil :init (setq evil-want-integration t evil-want-keybinding nil) :config (evil-mode 1))
-(use-package evil-collection :after evil :config (evil-collection-init))
-(use-package ace-window :bind ("M-o" . ace-window) :config (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+(setq use-package-always-ensure t)
+
+;;; -------------------------
+;;; UI sanity
+;;; -------------------------
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
+(setq inhibit-startup-message t)
+(show-paren-mode 1)
+(global-display-line-numbers-mode 1)
+
+;;; -------------------------
+;;; Files
+;;; -------------------------
+(setq make-backup-files nil
+      auto-save-default nil
+      create-lockfiles nil)
+
+;;; -------------------------
+;;; Completion / minibuffer
+;;; -------------------------
+(use-package vertico
+  :init (vertico-mode))
+
+(use-package orderless
+  :custom (completion-styles '(orderless basic)))
+
+(use-package marginalia
+  :init (marginalia-mode))
+
+(use-package consult)
+
+;;; -------------------------
+;;; Discovery
+;;; -------------------------
+(use-package which-key
+  :init (which-key-mode))
+
+;;; -------------------------
+;;; Editing
+;;; -------------------------
+(use-package evil
+  :init
+  (setq evil-want-integration t
+        evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
+
+;;; -------------------------
+;;; Windows
+;;; -------------------------
+(use-package ace-window
+  :bind ("M-o" . ace-window))
+
 (global-set-key (kbd "C-x |") 'split-window-right)
 (global-set-key (kbd "C-x -") 'split-window-below)
 (global-set-key (kbd "C-x +") 'balance-windows)
 (global-set-key (kbd "C-x x") 'delete-window)
-(setq org-directory "~/Documents/org-roam/")
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
-(setq projectile-project-search-path '("~/Documents/org-roam/"))
-(use-package deft :bind ("C-c d" . deft-find-file) :config (setq deft-extensions '("org" "txt" "md") deft-directory org-directory deft-recursive t deft-use-filename-as-title t))
-(use-package doom-modeline :init (doom-modeline-mode 1) :custom (doom-modeline-height 25) (doom-modeline-icon t))
-(use-package all-the-icons :if (display-graphic-p))
+
+;;; -------------------------
+;;; Projects
+;;; -------------------------
+(use-package project
+  :ensure nil)
+
+;;; -------------------------
+;;; Version control
+;;; -------------------------
+(use-package magit
+  :bind ("C-x g" . magit-status))
+
+;;; -------------------------
+;;; Programming essentials
+;;; -------------------------
+(use-package company
+  :hook (prog-mode . company-mode)
+  :config
+  (setq company-idle-delay 0.3
+       company-minimum-prefix-length 2))
+
+(use-package flymake
+  :ensure nil
+  :hook (prog-mode . flymake-mode))
+
+;;; -------------------------
+;;; IDE features (minimal)
+;;; -------------------------
+(use-package eglot
+  :ensure nil
+  :hook ((python-mode . eglot-ensure)
+         (go-mode . eglot-ensure)))
+
+;;; -------------------------
+;;; Languages
+;;; -------------------------
+(use-package python-mode)
+(use-package go-mode)
+
+;;; -------------------------
+;;; Org
+;;; -------------------------
+(use-package org
+  :ensure nil)
+
