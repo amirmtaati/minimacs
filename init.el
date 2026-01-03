@@ -26,7 +26,18 @@
 (setq inhibit-startup-message t)
 (show-paren-mode 1)
 (global-display-line-numbers-mode 1)
+(set-face-attribute 'default nil
+                    :family "FiraCode Nerd Font"
+                    :height 140)
 
+(setq-default prettify-symbols-alist
+              '(("lambda" . ?λ)))
+
+(global-prettify-symbols-mode 1)
+
+
+;;; Theme
+(load-theme 'modus-vivendi t)
 ;;; -------------------------
 ;;; Files
 ;;; -------------------------
